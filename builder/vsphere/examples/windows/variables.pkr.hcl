@@ -28,6 +28,10 @@ variable "vcenter_datacenter" {
     description = "The name of the Datacenter in vCenter Packer will build in"
     type = string
 }
+variable "vcenter_host" {
+    description = "The name of the Datacenter in vCenter Packer will build in"
+    type = string
+}
 
 variable "vcenter_cluster" {
     description = "The name of the Cluster in vCenter Packer will build in"
@@ -89,6 +93,7 @@ variable "vm_nic_type" {
 variable "vm_network" {
     description = "The name of the network that the VM will connect to"
     type = string
+    default="TEST2_DC05-WG015_10.32.114.0_25_v840"
 }
 
 variable "vm_disk_controller" {

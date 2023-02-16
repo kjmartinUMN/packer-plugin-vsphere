@@ -1,32 +1,38 @@
 # source blocks are generated from your builders; a source can be referenced in
-# build blocks. A build block runs provisioner and post-processors on a
+# build blocks. Aabuild block runs provisioner and post-processors on a
 # source. Read the documentation for source blocks here:
 # https://www.packer.io/docs/templates/hcl_templates/blocks/source
 source "vsphere-iso" "example_windows" {
   CPUs                 = 1
   RAM                  = 4096
-  RAM_reserve_all      = true
+  RAM_reserve_all      = false
   communicator         = "winrm"
   disk_controller_type = ["pvscsi"]
-  floppy_files         = ["${path.root}/setup/"]
-  floppy_img_path      = "[datastore1] ISO/VMware Tools/10.2.0/pvscsi-Windows8.flp"
-  guest_os_type        = "windows9_64Guest"
-  host                 = "esxi-1.vsphere65.test"
-  insecure_connection  = "true"
-  iso_paths            = ["[datastore1] ISO/en_windows_10_multi-edition_vl_version_1709_updated_dec_2017_x64_dvd_100406172.iso", "[datastore1] ISO/VMware Tools/10.2.0/windows.iso"]
+  #floppy_files         = ["${path.root}/setup/"]
+  #floppy_img_path      = "[datastore1] ISO/VMware Tools/10.2.0/pvscsi-Windows8.flp"
+  guest_os_type        = "windows9Server64Guest"
+  cluster              = var.vcenter_cluster
+  host                 = var.vcenter_host
+  
+  datastore            = var.vcenter_datastore
+  insecure_connection  = "false"
+  iso_paths            = ["[oit-test-001] ISOs/SW_DVD9_Win_Server_STD_CORE_2022_2108.1_64Bit_English_DC_STD_MLF_X22-82986.ISO"]
   network_adapters {
-    network_card = "vmxnet3"
-  }
-  password = "jetbrains"
+    network_card = "e1000e"
+    network      =  var.vm_network
+    mac_address          = "00:50:56:bf:1e:a3"
+      }
+  password = var.vcenter_password
   storage {
     disk_size             = 32768
     disk_thin_provisioned = true
   }
-  username       = "root"
-  vcenter_server = "vcenter.vsphere65.test"
-  vm_name        = "example-windows"
+  username       = var.vcenter_username
+  vcenter_server = var.vcenter_server
+  vm_name        = "HEAT-Pack1"
   winrm_password = "jetbrains"
   winrm_username = "jetbrains"
+  
 }
 
 # a build block invokes sources and runs provisioning steps on them. The
@@ -36,6 +42,7 @@ build {
   sources = ["source.vsphere-iso.example_windows"]
 
   provisioner "windows-shell" {
-    inline = ["dir c:\\"]
+    inline = ["dir"]
   }
 }
+  
