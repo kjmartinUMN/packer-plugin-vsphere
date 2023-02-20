@@ -6,9 +6,12 @@ source "vsphere-iso" "example_windows" {
   CPUs                 = 1
   RAM                  = 4096
   RAM_reserve_all      = false
+  firmware             = "efi"
   communicator         = "winrm"
   disk_controller_type = ["pvscsi"]
-  #floppy_files         = ["${path.root}/setup/"]
+  floppy_files         = ["bootfiles/win2022/datacenter/autounattend.xml",
+                          "scripts/common/install-vmtools64.cmd",
+                          "scripts/common/initial-setup.ps1"]
   #floppy_img_path      = "[datastore1] ISO/VMware Tools/10.2.0/pvscsi-Windows8.flp"
   guest_os_type        = "windows9Server64Guest"
   cluster              = var.vcenter_cluster
@@ -24,7 +27,7 @@ source "vsphere-iso" "example_windows" {
       }
   password = var.vcenter_password
   storage {
-    disk_size             = 32768
+    disk_size             = 81920
     disk_thin_provisioned = true
   }
   username       = var.vcenter_username
@@ -40,9 +43,8 @@ source "vsphere-iso" "example_windows" {
 # https://www.packer.io/docs/templates/hcl_templates/blocks/build
 build {
   sources = ["source.vsphere-iso.example_windows"]
-
-  provisioner "windows-shell" {
-    inline = ["dir"]
-  }
-}
   
+  provisioner "powershell" {
+    scripts = ["${path.root}/setup/setup.ps1"]
+  }
+}  
